@@ -1,0 +1,24 @@
+---
+
+  - name: Running Script Sessia
+    gather_facts: false
+    hosts: all
+    tasks:
+      - name: Obtaining variable
+        include_vars: dest-ip.yml
+
+      - name: Ping Command
+        shell: |
+          echo "Hostname: `/bin/hostname`"
+          echo "Date: `date`"
+          echo "Dest: {{ item }}"
+          echo "---Result---"
+          /bin/ping {{ item }} -c 2
+        with_items: "{{ to_dest }}"
+        debugger: never
+        register: output_ping
+
+      - name: Output
+        debug:
+          msg: "{{ item.stdout_lines  | join('\n') }}"
+        with_items: "{{ output_ping.results }}"
